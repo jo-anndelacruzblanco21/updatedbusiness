@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filipino Pastries</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="filipino.css">
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #483a1e;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            font-weight: bolder;
+            color: white;
+        }
+
+        .modal-content h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #checkoutForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #checkoutForm label {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #checkoutForm input,
+        #checkoutForm textarea {
+            width: 90%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        #checkoutForm textarea {
+            resize: none;
+            height: 80px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-buttons button.cancel {
+            background: #f44336;
+            color: white;
+        }
+
+        .modal-buttons button.submit {
+            background: #4caf50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul class="navbar">
+            <li><a href="bakeryhome.html">Home</a></li>
+            <li><a href="products.html">Product Categories</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li class="menu-icons" id="cart-icon"><i class="fas fa-shopping-cart"></i></li>
+            <span>0</span>
+        </ul>
+    </nav>
+    
+    <div class="coffeeprod">
+        <h1>Filipino Pastries</h1>
+    </div>
+    
+    <div class="listProduct"></div>
+    
+    <div class="cartTab">
+        <h1>Shopping Cart</h1>
+        <div class="listCart"></div>
+        <div class="btn">
+            <button class="close">Close</button>
+            <button class="checkOut">Check Out</button>
+        </div>
+        <div class="totalBalance">
+            <strong>Total Balance: ₱<span id="totalBalance">0.00</span></strong>
+        </div>
+    </div>
+
+    <!-- Modal for Checkout Details -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <h2>Checkout Details</h2>
+            <form id="checkoutForm">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="contact">Contact Number:</label>
+                <input type="tel" id="contact" name="contact" required pattern="[0-9]{11}">
+
+                <label for="address">Address:</label>
+                <textarea id="address" name="address" required></textarea>
+
+                <label for="landmark">Landmark:</label>
+                <input type="text" id="landmark" name="landmark">
+
+                <div class="modal-buttons">
+                    <button type="button" class="cancel">Cancel</button>
+                    <button type="submit" class="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+  
+    <script>
+        // Centralized Local Storage Utility
+        const Storage = {
+            save(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            },
+
+            get(key) {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            },
+
+            remove(key) {
+                localStorage.removeItem(key);
+            }
+        };
+
+        let iconCart = document.querySelector('.menu-icons');
+        let closeCart = document.querySelector('.close');
+        let body = document.querySelector('body');
+        let listProductHTML = document.querySelector('.listProduct');
+        let listCartHTML = document.querySelector('.listCart');
+        let iconCartSpan = document.querySelector('#cart-icon + span');
+        let totalBalanceHTML = document.querySelector('#totalBalance');
+        let checkOutButton = document.querySelector('.checkOut');
+        let checkoutModal = document.getElementById('checkoutModal');
+        let checkoutForm = document.getElementById('checkoutForm');
+        let cancelButton = checkoutModal.querySelector('.cancel');
+
+        let listProducts = [];
+        let carts = Storage.get('cart') || [];
+
+        // Toggle cart visibility
+        iconCart.addEventListener('click', () => {
+            body.classList.toggle('showCart');
+        });
+
+        closeCart.addEventListener('click', () => {
+            body.classList.toggle('showCart');
+        });
+
+        // Save cart to local storage
+        const saveCartToLocalStorage = () => {
+            Storage.save('cart', carts);
+        };
+
+        // Render products to HTML
+        const addDataToHTML = () => {
+            listProductHTML.innerHTML = '';
+            if (listProducts.length > 0) {
+                listProducts.forEach(product => {
+                    let newProduct = document.createElement('div');
+                    newProduct.classList.add('item');
+                    newProduct.dataset.id = product.id;
+                    newProduct.innerHTML = `
+                        <img src="${product.image}" alt="Pastry">
+                        <h2>${product.name}</h2>
+                        <div class="price">₱${product.price}</div>
+                        <button class="addCart">Add To Cart</button>
+                    `;
+                    listProductHTML.appendChild(newProduct);
+                });
+            }
+        };
+
+        // Handle add to cart action
+        const handleAddToCart = (product_id) => {
+            let positionThisProductInCart = carts.findIndex(value => value.product_id === product_id);
+            if (positionThisProductInCart < 0) {
+                carts.push({ product_id: product_id, quantity: 1 });
+            } else {
+                carts[positionThisProductInCart].quantity += 1;
+            }
+            saveCartToLocalStorage();
+            addToCartHTML();
+        };
+
+        // Render cart to HTML
+        const addToCartHTML = () => {
+            listCartHTML.innerHTML = '';
+            let totalQuantity = 0;
+            let totalBalance = 0;
+            if (carts.length > 0) {
+                carts.forEach(cart => {
+                    totalQuantity += cart.quantity;
+                    let newCart = document.createElement('div');
+                    newCart.classList.add('item');
+                    let positionProduct = listProducts.findIndex((value) => value.id == cart.product_id);
+                    let info = listProducts[positionProduct];
+                    let itemTotalPrice = info.price * cart.quantity;
+                    totalBalance += itemTotalPrice;
+
+                    newCart.innerHTML = `
+                        <div class="item">
+                            <div class="image">
+                                <img src="${info.image}" alt="${info.name}">
+                            </div>
+                            <div class="name">${info.name}</div>
+                            <div class="totalPrice">₱${itemTotalPrice}</div>
+                            <div class="quantity">
+                                <span class="minus"><</span>
+                                <span class="count">${cart.quantity}</span>
+                                <span class="plus">></span>
+                            </div>
+                        </div>`;
+
+                    listCartHTML.appendChild(newCart);
+
+                    // Handle quantity changes
+                    let minusButton = newCart.querySelector('.minus');
+                    let plusButton = newCart.querySelector('.plus');
+                    let countSpan = newCart.querySelector('.count');
+
+                    minusButton.addEventListener('click', () => {
+                        if (cart.quantity > 1) {
+                            cart.quantity -= 1;
+                        } else {
+                            carts = carts.filter(cartItem => cartItem.product_id !== cart.product_id);
+                        }
+                        saveCartToLocalStorage();
+                        addToCartHTML();
+                    });
+
+                    plusButton.addEventListener('click', () => {
+                        cart.quantity += 1;
+                        saveCartToLocalStorage();
+                        addToCartHTML();
+                    });
+
+                    countSpan.textContent = cart.quantity;
+                });
+            }
+            iconCartSpan.innerText = totalQuantity;
+            totalBalanceHTML.textContent = totalBalance.toFixed(2);
+        };
+
+        // Checkout button logic
+        checkOutButton.addEventListener('click', () => {
+            checkoutModal.style.display = 'flex';
+        });
+
+        cancelButton.addEventListener('click', () => {
+            checkoutModal.style.display = 'none';
+        });
+
+        // Handle checkout form submission
+        checkoutForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const contact = document.getElementById('contact').value;
+            const address = document.getElementById('address').value;
+            const landmark = document.getElementById('landmark').value;
+
+            alert(`Thank you, ${name}! Your order will be delivered to ${address}.`);
+
+            // Empty cart after checkout
+            carts = [];
+            saveCartToLocalStorage();
+            addToCartHTML();
+
+            checkoutForm.reset();
+            checkoutModal.style.display = 'none';
+        });
+
+        // Initialize the page
+        const initApp = () => {
+            fetch('filipino-pastries.json')
+                .then(response => response.json())
+                .then(data => {
+                    listProducts = data;
+                    addDataToHTML();
+                    addToCartHTML();
+                })
+                .catch(error => {
+                    console.error('Error fetching Filipino pastries:', error);
+                    alert('Failed to load Filipino pastries. Please try again later.');
+                });
+        };
+
+        initApp();
+
+        // Event listener for adding products to the cart
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('addCart')) {
+                const product_id = event.target.closest('.item').dataset.id;
+                handleAddToCart(product_id);
+            }
+        });
+    </script>
+</body>
+</html>

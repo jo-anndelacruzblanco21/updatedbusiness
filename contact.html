@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://fruitbasket.limepack.com/blog/wp-content/uploads/2024/03/modern-cafe-house.jpg');
+            background-size: cover; 
+            background-attachment: fixed; 
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .container {
+            width: 900px;
+            max-width: 90vw;
+            margin: auto;
+            text-align: center;
+            padding-top: 10px;
+            transition: transform .5s;
+        }
+
+        nav {
+            position: sticky; 
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+            list-style: none;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 24px;
+        }
+
+        .navbar a {
+            text-decoration: none; 
+            color: #f7e9d7; 
+            font-size: 20px;
+            font-weight: 500;
+            padding: 8px 15px; 
+            margin-right: 80px;
+            transition: background-color 0.2s ease, color 0.2s ease, border-radius 0.2s ease;
+            text-align: center;
+        }
+
+        .navbar a:hover {
+            background-color: #463123; 
+            border-radius: 20px;
+            padding: 10px 18px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .contact-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            margin: 50px auto;
+            max-width: 600px;
+        }
+
+        .contact-container h1 {
+            color: #463123;
+            margin-bottom: 20px;
+        }
+
+        .contact-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-container input, 
+        .contact-container textarea, 
+        .contact-container button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .contact-container button {
+            background-color: #463123;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .contact-container button:hover {
+            background-color: #5c4227;
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #f7e9d7;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer .contact-info {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul class="navbar">
+            <li><a href="bakeryhome.html">Home</a></li>
+            <li><a href="products.html">Product Categories</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+    </nav>
+
+    <div class="contact-container">
+        <h1>Contact Us</h1>
+        <p>We would love to hear from you! Please fill out the form below and we'll get back to you as soon as possible.</p>
+        <form id="contactForm">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <input type="text" name="subject" placeholder="Subject" required>
+            <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>Contact Information:</p>
+        <div class="contact-info">
+            <p>Location: 123 Bakery Lane, Sweetville</p>
+            <p>0900-000-0000</p>
+            <p>Contact Person: Jo-ann Blanco </p>
+        </div>
+    </footer>
+
+    <script>
+        
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            alert('Your message has been successfully submitted. Thank you!');
+            this.reset();
+        });
+    </script>
+</body>
+</html>
